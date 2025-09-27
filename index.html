@@ -36,59 +36,65 @@
     }
 
     function analyzeDates() {
-      const fromDate = new Date(document.getElementById('fromDate').value);
-      const toDate = new Date(document.getElementById('toDate').value);
-      const resultsDiv = document.getElementById('results');
-      resultsDiv.innerHTML = '';
+  const fromDate = new Date(document.getElementById('fromDate').value);
+  const toDate = new Date(document.getElementById('toDate').value);
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerHTML = '';
 
-      if (isNaN(fromDate) || isNaN(toDate) || fromDate > toDate) {
-        resultsDiv.innerHTML = '<p>Please select valid dates.</p>';
-        return;
-      }
+  if (isNaN(fromDate) || isNaN(toDate) || fromDate > toDate) {
+    resultsDiv.innerHTML = '<p>Please select valid dates.</p>';
+    return;
+  }
 
-      const years = new Set();
-      const primeDates = [];
-      let currentDate = new Date(fromDate);
+  const yearCounts = {}; // { YYYY: count }
+  const primeDates = [];
+  let currentDate = new Date(fromDate);
 
-      while (currentDate <= toDate) {
-        const yyyy = currentDate.getFullYear();
-        const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
-        const dd = String(currentDate.getDate()).padStart(2, '0');
-        const yyyymmdd = parseInt(`${yyyy}${mm}${dd}`, 10);
+  while (currentDate <= toDate) {
+    const yyyy = currentDate.getFullYear();
+    const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(currentDate.getDate()).padStart(2, '0');
+    const yyyymmdd = parseInt(`${yyyy}${mm}${dd}`, 10);
 
-        years.add(yyyy);
-        if (isPrime(yyyymmdd)) {
-          primeDates.push(new Date(currentDate));
-        }
+    if (!yearCounts[yyyy]) yearCounts[yyyy] = 0;
 
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-
-      // Calculate gaps between prime dates
-      const gaps = [];
-      for (let i = 1; i < primeDates.length; i++) {
-        const gap = (primeDates[i] - primeDates[i - 1]) / (1000 * 60 * 60 * 24);
-        gaps.push(gap);
-      }
-
-      const minGap = gaps.length ? Math.min(...gaps) : 'N/A';
-      const maxGap = gaps.length ? Math.max(...gaps) : 'N/A';
-
-      // Display results
-      resultsDiv.innerHTML = `
-        <h3>Years in Range:</h3>
-        <ul>${[...years].map(y => `<li>${y}</li>`).join('')}</ul>
-
-        <h3>Prime Dates (YYYYMMDD):</h3>
-        <ul>${primeDates.map(d => `<li>${d.toISOString().slice(0,10).replace(/-/g, '')}</li>`).join('')}</ul>
-
-        <h3>Minimum Days Between Prime Dates:</h3>
-        <p>${minGap}</p>
-
-        <h3>Maximum Days Between Prime Dates:</h3>
-        <p>${maxGap}</p>
-      `;
+    if (isPrime(yyyymmdd)) {
+      primeDates.push(new Date(currentDate));
+      yearCounts[yyyy]++;
     }
+
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  // Calculate gaps between prime dates
+  const gaps = [];
+  for (let i = 1; i < primeDates.length; i++) {
+    const gap = (primeDates[i] - primeDates[i - 1]) / (1000 * 60 * 60 * 24);
+    gaps.push(gap);
+  }
+
+  const minGap = gaps.length ? Math.min(...gaps) : 'N/A';
+  const maxGap = gaps.length ? Math.max(...gaps) : 'N/A';
+
+  // Display results
+  resultsDiv.innerHTML = `
+    <h3>Years in Range (Prime Count):</h3>
+    <ul>${Object.entries(yearCounts)
+      .map(([year, count]) => `<li>${year} — ${count} prime day${count !== 1 ? 's' : ''}</li>`)
+      .join('')}</ul>
+
+    <h3>Prime Dates (YYYYMMDD):</h3>
+    <ul>${primeDates.map(d => `<li>${d.toISOString().slice(0,10).replace(/-/g, '')}</li>`).join('')}</ul>
+
+    <h3>Minimum Days Between Prime Dates:</h3>
+    <p>${minGap}</p>
+
+    <h3>Maximum Days Between Prime Dates:</h3>
+    <p>${maxGap}</p>
+  `;
+}
+
   </script>
 </body>
 </html>
+
