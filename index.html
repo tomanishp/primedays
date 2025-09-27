@@ -35,7 +35,7 @@
       return true;
     }
 
-    function analyzeDates() {
+  function analyzeDates() {
   const fromDate = new Date(document.getElementById('fromDate').value);
   const toDate = new Date(document.getElementById('toDate').value);
   const resultsDiv = document.getElementById('results');
@@ -66,15 +66,25 @@
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
-  // Calculate gaps between prime dates
-  const gaps = [];
+  // Calculate gaps and track dates
+  let minGap = Infinity;
+  let maxGap = -Infinity;
+  let minPair = null;
+  let maxPair = null;
+
   for (let i = 1; i < primeDates.length; i++) {
     const gap = (primeDates[i] - primeDates[i - 1]) / (1000 * 60 * 60 * 24);
-    gaps.push(gap);
+    if (gap < minGap) {
+      minGap = gap;
+      minPair = [primeDates[i - 1], primeDates[i]];
+    }
+    if (gap > maxGap) {
+      maxGap = gap;
+      maxPair = [primeDates[i - 1], primeDates[i]];
+    }
   }
 
-  const minGap = gaps.length ? Math.min(...gaps) : 'N/A';
-  const maxGap = gaps.length ? Math.max(...gaps) : 'N/A';
+  const formatDate = date => date.toISOString().slice(0,10).replace(/-/g, '');
 
   // Display results
   resultsDiv.innerHTML = `
@@ -84,17 +94,19 @@
       .join('')}</ul>
 
     <h3>Prime Dates (YYYYMMDD):</h3>
-    <ul>${primeDates.map(d => `<li>${d.toISOString().slice(0,10).replace(/-/g, '')}</li>`).join('')}</ul>
+    <ul>${primeDates.map(d => `<li>${formatDate(d)}</li>`).join('')}</ul>
 
     <h3>Minimum Days Between Prime Dates:</h3>
-    <p>${minGap}</p>
+    <p>${minGap === Infinity ? 'N/A' : `${minGap} days between ${formatDate(minPair[0])} and ${formatDate(minPair[1])}`}</p>
 
     <h3>Maximum Days Between Prime Dates:</h3>
-    <p>${maxGap}</p>
+    <p>${maxGap === -Infinity ? 'N/A' : `${maxGap} days between ${formatDate(maxPair[0])} and ${formatDate(maxPair[1])}`}</p>
   `;
 }
+
 
   </script>
 </body>
 </html>
+
 
