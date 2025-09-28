@@ -1,19 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Prime Date Analyzer</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    label, input { margin: 10px 0; display: block; }
-    .results { margin-top: 20px; }
-    ul { padding-left: 20px; }
-  </style>
-</head>
-<body>
-  <h1>Prime Date Analyzer</h1>
 
-      <table>
+<head>
+    <meta charset="UTF-8">
+    <title>Prime Date Analyzer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        label,
+        input {
+            margin: 10px 0;
+            display: block;
+        }
+
+        .results {
+            margin-top: 20px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Prime Date Analyzer</h1>
+
+    <table>
         <tr>
             <td>
                 <label for="fromDate">From Date:</label>
@@ -24,83 +40,91 @@
                 <input type="date" id="toDate">
             </td>
         </tr>
-      </table>
+    </table>
 
-  <button onclick="analyzeDates()">Analyze</button>
+    <button onclick="analyzeDates()">Analyze</button>
 
-  <div class="results" id="results"></div>
+    <div class="results" id="results"></div>
 
-  <script>
-    function isPrime(num) {
-      if (num <= 1) return false;
-      if (num === 2) return true;
-      if (num % 2 === 0) return false;
-      const sqrt = Math.floor(Math.sqrt(num));
-      for (let i = 3; i <= sqrt; i += 2) {
-        if (num % i === 0) return false;
-      }
-      return true;
-    }
+    <script>
+        function isPrime(num) {
+            if (num <= 1) return false;
+            if (num === 2) return true;
+            if (num % 2 === 0) return false;
+            const sqrt = Math.floor(Math.sqrt(num));
+            for (let i = 3; i <= sqrt; i += 2) {
+                if (num % i === 0) return false;
+            }
+            return true;
+        }
+        
+        function formatDateLocal(date) {
+            const yyyy = date.getFullYear();
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
 
-  function analyzeDates() {
-  const fromDate = new Date(document.getElementById('fromDate').value);
-  const toDate = new Date(document.getElementById('toDate').value);
-  const resultsDiv = document.getElementById('results');
-  resultsDiv.innerHTML = '';
+        function analyzeDates() {
+            const fromDate = new Date(document.getElementById('fromDate').value);
+            const toDate = new Date(document.getElementById('toDate').value);
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
 
-  if (isNaN(fromDate) || isNaN(toDate) || fromDate > toDate) {
-    resultsDiv.innerHTML = '<p>Please select valid dates.</p>';
-    return;
-  }
+            if (isNaN(fromDate) || isNaN(toDate) || fromDate > toDate) {
+                resultsDiv.innerHTML = '<p>Please select valid dates.</p>';
+                return;
+            }
 
-  const yearCounts = {}; // { YYYY: count }
-  const primeDates = [];
-  let currentDate = new Date(fromDate);
+            const yearCounts = {}; // { YYYY: count }
+            const primeDates = [];
+            let currentDate = new Date(fromDate);
 
-  while (currentDate <= toDate) {
-    const yyyy = currentDate.getFullYear();
-    const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
-    const dd = String(currentDate.getDate()).padStart(2, '0');
-    const yyyymmdd = parseInt(`${yyyy}${mm}${dd}`, 10);
+            while (currentDate <= toDate) {
+                const yyyy = currentDate.getFullYear();
+                const mm = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const dd = String(currentDate.getDate()).padStart(2, '0');
+                const yyyymmdd = parseInt(`${yyyy}${mm}${dd}`, 10);
 
-    if (!yearCounts[yyyy]) yearCounts[yyyy] = 0;
+                if (!yearCounts[yyyy]) yearCounts[yyyy] = 0;
 
-    if (isPrime(yyyymmdd)) {
-      primeDates.push(new Date(currentDate));
-      yearCounts[yyyy]++;
-    }
+                if (isPrime(yyyymmdd)) {
+                    primeDates.push(new Date(currentDate));
+                    yearCounts[yyyy]++;
+                }
 
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
 
-  // Calculate gaps and track dates
-  let minGap = Infinity;
-  let maxGap = -Infinity;
-  let minPair = null;
-  let maxPair = null;
+            // Calculate gaps and track dates
+            let minGap = Infinity;
+            let maxGap = -Infinity;
+            let minPair = null;
+            let maxPair = null;
 
-  for (let i = 1; i < primeDates.length; i++) {
-    const gap = (primeDates[i] - primeDates[i - 1]) / (1000 * 60 * 60 * 24);
-    if (gap < minGap) {
-      minGap = gap;
-      minPair = [primeDates[i - 1], primeDates[i]];
-    }
-    if (gap > maxGap) {
-      maxGap = gap;
-      maxPair = [primeDates[i - 1], primeDates[i]];
-    }
-  }
+            for (let i = 1; i < primeDates.length; i++) {
+                const gap = (primeDates[i] - primeDates[i - 1]) / (1000 * 60 * 60 * 24);
+                if (gap < minGap) {
+                    minGap = gap;
+                    minPair = [primeDates[i - 1], primeDates[i]];
+                }
+                if (gap > maxGap) {
+                    maxGap = gap;
+                    maxPair = [primeDates[i - 1], primeDates[i]];
+                }
+            }
 
-  const formatDate = date => date.toISOString().slice(0,10).replace(/-/g, '');
+            //const formatDate = date => date.toISOString().slice(0, 10).replace(/-/g, '');
+            const formatDate = date => formatDateLocal(date);
 
-  // Display results
-  resultsDiv.innerHTML = `
+            // Display results
+            resultsDiv.innerHTML = `
     <h3>Years in Range (Prime Count):</h3>
     <ul>${Object.entries(yearCounts)
-      .map(([year, count]) => `<li>${year} — ${count} prime day${count !== 1 ? 's' : ''}</li>`)
-      .join('')}</ul>
+                    .map(([year, count]) => `<li>${year} — ${count} prime day${count !== 1 ? 's' : ''}</li>`)
+                    .join('')}</ul>
 
-    <h3>Prime Dates (YYYYMMDD):</h3>
+    <h3>Prime Dates (YYYY-MM-DD):</h3>
     <ul>${primeDates.map(d => `<li>${formatDate(d)}</li>`).join('')}</ul>
 
     <h3>Minimum Days Between Prime Dates:</h3>
@@ -109,12 +133,10 @@
     <h3>Maximum Days Between Prime Dates:</h3>
     <p>${maxGap === -Infinity ? 'N/A' : `${maxGap} days between ${formatDate(maxPair[0])} and ${formatDate(maxPair[1])}`}</p>
   `;
-}
+        }
 
 
-  </script>
+    </script>
 </body>
+
 </html>
-
-
-
