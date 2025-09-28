@@ -163,14 +163,14 @@
                     .map(([year, count]) => `<li>${year} — ${count} prime day${count !== 1 ? 's' : ''}</li>`)
                     .join('')}</ul>
 
-    <h3>Prime Dates (YYYY-MM-DD):</h3>
-    <ul>${primeDates.map(d => `<li>${formatDate(d)}</li>`).join('')}</ul>
-
     <h3>Minimum Days Between Prime Dates:</h3>
     <p>${minGap === Infinity ? 'N/A' : `${minGap} days between ${formatDate(minPair[0])} and ${formatDate(minPair[1])}`}</p>
 
     <h3>Maximum Days Between Prime Dates:</h3>
     <p>${maxGap === -Infinity ? 'N/A' : `${maxGap} days between ${formatDate(maxPair[0])} and ${formatDate(maxPair[1])}`}</p>
+
+    <h3>Prime Dates (YYYY-MM-DD):</h3>
+    <ul>${primeDates.map(d => `<li>${formatDate(d)}</li>`).join('')}</ul>
   `;
         }
 
